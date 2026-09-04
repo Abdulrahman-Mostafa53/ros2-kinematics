@@ -13,10 +13,12 @@ from kinematics.robot_kinematics import (
     FourWheelOmniKinematics
 )
 
+from tf2_ros import TransformBroadcaster
 
 class WheelOdometryNode(Node):
     def __init__(self):
         super().__init__("wheel_odometry_node")
+       
 
         self.declare_parameters(
             namespace="",
@@ -53,6 +55,7 @@ class WheelOdometryNode(Node):
             "/odom",
             10
         )
+        
 
     def set_kinematics(self):
         L = self.track_width
@@ -136,6 +139,40 @@ class WheelOdometryNode(Node):
         odom.twist.twist.angular.z = wz
 
         self.publisher.publish(odom)
+  # Broadcast TF
+        self.publish_tf(current_time)
+
+    def publish_tf(self, current_time):
+
+        transform = TransformStamped()
+
+        # Header
+        transform.header.stamp = current_time.to_msg()
+        transform.header.frame_id = "odom"
+
+        # Child frame
+        transform.child_frame_id = "base_link"
+
+        # Translation
+        transform.transform.translation.x = self.x
+        transform.transform.translation.y = self.y
+        transform.transform.translation.z = 0.0
+
+        # Rotation
+        transform.transform.rotation.x = 0.0
+        transform.transform.rotation.y = 0.0
+
+        transform.transform.rotation.z = np.sin(
+            self.theta / 2.0
+        )
+
+        transform.transform.rotation.w = np.cos(
+            self.theta / 2.0
+        )
+
+        # Broadcast
+        self.tf_broadcaster.sendTransform(transform)
+
 
 
 def main():
