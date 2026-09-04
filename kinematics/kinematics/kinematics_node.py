@@ -1,12 +1,6 @@
 import rclpy
 from rclpy.node import Node
-import kinematics.robot_kinematics
-from kinematics.robot_kinematics import (
-    DiffDriveKinematics, 
-    MecanumKinematics, 
-    ThreeWheelOmniKinematics, 
-    FourWheelOmniKinematics
-)
+from kinematics.robot_kinematics import *
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64MultiArray
 
@@ -27,7 +21,6 @@ class KinematicsNode(Node):
         self.drive_type, self.track_width, self.wheel_base, self.wheel_radius = (
             self.get_parameters(['drive_type','track_width','wheelbase','wheel_radius'])
         )
-        self.get_logger().info(self.drive_type.value)
         self.set_Kinematics()
 
 
@@ -41,7 +34,7 @@ class KinematicsNode(Node):
 
         self.publisher = self.create_publisher(
             Float64MultiArray,
-            '/movement_speed',
+            '/wheel_setpoints',
             10
         )    
 
@@ -62,6 +55,7 @@ class KinematicsNode(Node):
         
      wheels_array = Float64MultiArray()
      wheels_array.data = wheel_speeds.tolist()
+     self.get_logger().info(str(wheels_array.data))
      self.publisher.publish(wheels_array)
 
 
@@ -73,7 +67,7 @@ class KinematicsNode(Node):
      W = self.wheel_base.value
      R = self.wheel_radius.value
 
-     if d_type in ["diff", "diff_drive"]:
+     if d_type  == "diff":
         self.kinematics = DiffDriveKinematics(L, R, W)
      elif d_type == "mecanum":
         self.kinematics = MecanumKinematics(L, R, W)

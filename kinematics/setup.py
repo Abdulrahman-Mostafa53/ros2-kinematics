@@ -24,7 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'kinematics_node = kinematics.kinematics_node:main'
+            'kinematics_node = kinematics.kinematics_node:main',
+            'speed_publisher = kinematics.test:main'
         ],
     },
 )
