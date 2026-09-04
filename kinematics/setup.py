@@ -25,7 +25,12 @@ setup(
     entry_points={
         'console_scripts': [
             'kinematics_node = kinematics.kinematics_node:main',
+<<<<<<< HEAD
             'speed_publisher = kinematics.test:main'
+=======
+            'speed_publisher = kinematics.test:main',
+            'wheel_odometry_node = kinematics.wheel_odometry_node:main',
+>>>>>>> part3-packaging-fix
         ],
     },
 )
